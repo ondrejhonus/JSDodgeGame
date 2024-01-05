@@ -6,14 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Main screen</title>
     <link rel="icon" href="img/logoBall.png">
-    <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 
 <body>
     <header>
+        <div class="modal fade" id="cookieModal" tabindex="-1" role="dialog" aria-labelledby="cookieModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="cookieModalLabel">Cookie Consent</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>This website uses cookies to ensure you get the best experience on our website. By continuing to use this site, you are agreeing to our use of cookies. For more information, please read our <a href="/privacy-policy">Privacy Policy</a>.</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" data-dismiss="modal">Got it!</button>
+                </div>
+              </div>
+            </div>
+          </div>
         <form action="https://ondrejhonus.xyz" target="_blank">
             <button class="website">My website</button>
         </form>
@@ -27,6 +44,15 @@
     <footer>
         <p>&copy; 2024 - Ondřej Honus</p>
     </footer>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function(){
+      // Show the modal on page load
+      $('#cookieModal').modal('show');
+    });
+  </script>
 </body>
 
 </html>
