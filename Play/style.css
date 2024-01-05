@@ -17,3 +17,28 @@ h1{
 p{
     color: white;
 }
+div.scores{
+    background-color: #e5e5f7;
+    padding: 1em;
+    position: absolute;
+    right: 0;
+    top: 0;
+    text-align: left;
+    margin: 1em;
+    font-family: 'Press Start 2P';
+}
+
+div.scores p{
+    color: rgb(0, 0, 0);
+    font-size: larger;
+    font-weight: bolder;
+}
+/*#currentLevelDisplay{
+    color: goldenrod;
+    -webkit-text-stroke: #000000 1px;
+}
+#topLevelDisplay{
+    color: aqua;
+    -webkit-text-stroke: #000000 1px;
+}
+*/
