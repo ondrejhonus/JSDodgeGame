@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+body{
+    font-family: 'Poppins', sans-serif !important;
+    background-color: black;
+    color: white;
+    text-align: center;
+    background-color: #000000;
+opacity: 1;
+background-image:  linear-gradient(#0d0e30 8px, transparent 8px), linear-gradient(90deg, #0d0e30 8px, transparent 8px), linear-gradient(#0d0e30 4px, transparent 4px), linear-gradient(90deg, #0d0e30 4px, #000000 4px);
+background-size: 200px 200px, 200px 200px, 40px 40px, 40px 40px;
+background-position: -8px -8px, -8px -8px, -4px -4px, -4px -4px;
+}
+footer p{
+    margin: auto;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+button.button{
+    color: rgb(255, 255, 255);
+    background-color: rgb(13, 12, 77);
+    /*margin: 14em 0 0 0;*/
+    font-weight: 1000;
+    letter-spacing: 1px;
+    padding: 2em 4em 2em 4em;
+    font-size: xx-large;
+    text-align: center;
+    border-radius: 5px;
+    transition: all 0.25s ease !important;
+    border: solid 5px rgb(255, 255, 255);
+    vertical-align: middle;
+}
+
+button:hover {
+    opacity: 80% !important;
+    border: none !important;
+    border: solid 2px rgb(134, 134, 134) !important;
+}
+button.website{
+    background-color: rgb(13, 12, 77);
+    color: rgb(255, 255, 255);
+    margin: 5px;
+    font-weight: 600;
+    border: 2px white solid;
+    border-radius: 5px;
+    padding: 10px;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+h1{
+    margin-top: 7em;
+    vertical-align: middle;
+}
+a{
+    color: white;
+    text-decoration: none;
+}
