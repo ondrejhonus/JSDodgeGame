@@ -46,31 +46,57 @@ class Player {
 //**************************************************************//
 
 class BlinkingBall {
-    constructor() {
-        this.x = random(0, width);
-        this.y = random(0, height);
-        this.w = 40;
-        this.h = 40;
-        this.creationTime = millis(); // Record the creation time in milliseconds
-        this.appearDuration = 2000; // 2 seconds in milliseconds
-        this.explosionDuration = 1000; // 1 second in milliseconds
+    constructor(x = random(0, width), y = random(0, height), dirX = 0, dirY = 0, w = 40, h = 40, parent = true) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.dirX = dirX;
+        this.dirY = dirY;
+        this.creationTime = millis(); 
+        this.appearDuration = 2000;
+        this.explosionDuration = 500;
+        this.explosions = [];
+        this.parent = parent; 
+
+        if (this.parent) {
+            blinkingBalls.push(this);
+        }
+    }
+
+    drawn() {
+        let elapsedTime = millis() - this.creationTime;
+        return elapsedTime < this.appearDuration;
     }
 
     draw() {
         let elapsedTime = millis() - this.creationTime;
 
-        if (elapsedTime < this.appearDuration) {
+        if (this.drawn()) {
             // Red ball appearance
             fill('red');
             rectMode(CENTER);
             push();
             translate(this.x, this.y);
             rect(0, 0, this.w, this.h, 360, 360);
+            this.x += this.dirX;
+            this.y += this.dirY;
             pop();
-        } else if (elapsedTime < this.appearDuration + this.explosionDuration) {
-            // Explosion effect - size transition and color change
+        } else if (this.parent && elapsedTime < this.appearDuration + this.explosionDuration) {
             let newSize = map(elapsedTime - this.appearDuration, 0, this.explosionDuration, this.w, 50);
             let newColor = lerpColor(color('red'), color(255), (elapsedTime - this.appearDuration) / this.explosionDuration);
+            if (this.explosions.length < 10) {
+                for (let index = 0; index < 10; index++) {
+                    let angle = Math.random() * Math.PI * 2; // Random angle in radians
+                    let distance = Math.random() * 2 + 2; // Random distance between 50 and 100
+                    let x = Math.cos(angle) * distance;
+                    let y = Math.sin(angle) * distance;
+                if (random(-1, 1) > 0) x *= -1;
+                if (random(-1, 1) > 0) y *= -1;
+                console.log(x)
+                this.explosions.push(new BlinkingBall(this.x, this.y, x, y , 10, 10, false));
+            }
+        }
 
             fill(newColor);
             rectMode(CENTER);
@@ -80,6 +106,16 @@ class BlinkingBall {
             pop();
         } else {
             // The ball has disappeared
+            if (!this.explosions) return;
+            for (const explosion of this.explosions) {
+                if (explosion.parent) continue;
+                explosion.draw();
+            }
+            for (let index = 0; index < this.explosions.length; index++) {
+                const element = this.explosions[index];
+                if (!element.drawn()) this.explosions.splice(index, 1);
+            } 
+            console.log(this.explosions)
             return;
         }
     }
@@ -104,7 +140,7 @@ class BlinkingBall {
             console.log("new ball")
     }
         blinkingBalls.forEach((blinkingBall) => {
-            blinkingBall.draw(); 
+            blinkingBall.draw();
         });
 }
 
