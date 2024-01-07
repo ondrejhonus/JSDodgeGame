@@ -45,21 +45,44 @@ class Player {
 //************************BALL**************************//
 //**************************************************************//
 
-class BlinkingBall{
+class BlinkingBall {
     constructor() {
         this.x = random(0, width);
         this.y = random(0, height);
         this.w = 40;
         this.h = 40;
-        }
+        this.creationTime = millis(); // Record the creation time in milliseconds
+        this.appearDuration = 2000; // 2 seconds in milliseconds
+        this.explosionDuration = 1000; // 1 second in milliseconds
+    }
+
     draw() {
-        fill('red');
-        rectMode(CENTER);
-        push();
-        translate(this.x, this.y);
-        rect(0, 0, this.w, this.h, 360, 360);
-        pop();
-      }
+        let elapsedTime = millis() - this.creationTime;
+
+        if (elapsedTime < this.appearDuration) {
+            // Red ball appearance
+            fill('red');
+            rectMode(CENTER);
+            push();
+            translate(this.x, this.y);
+            rect(0, 0, this.w, this.h, 360, 360);
+            pop();
+        } else if (elapsedTime < this.appearDuration + this.explosionDuration) {
+            // Explosion effect - size transition and color change
+            let newSize = map(elapsedTime - this.appearDuration, 0, this.explosionDuration, this.w, 50);
+            let newColor = lerpColor(color('red'), color(255), (elapsedTime - this.appearDuration) / this.explosionDuration);
+
+            fill(newColor);
+            rectMode(CENTER);
+            push();
+            translate(this.x, this.y);
+            rect(0, 0, newSize, newSize, 360, 360);
+            pop();
+        } else {
+            // The ball has disappeared
+            return;
+        }
+    }
 }
 
 //**************************************************************//
@@ -80,7 +103,7 @@ class BlinkingBall{
             blinkingBalls.push(new BlinkingBall());
             console.log("new ball")
     }
-        blinkingBalls.forEach((blinkingBall, idx, arr) => {
+        blinkingBalls.forEach((blinkingBall) => {
             blinkingBall.draw(); 
         });
 }
