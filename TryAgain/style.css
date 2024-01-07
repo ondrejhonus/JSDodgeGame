@@ -7,13 +7,15 @@ body {
     text-align: center;
     background-color: #000000;
     opacity: 1;
-    background-image: linear-gradient(#0d0e30 8px, transparent 8px), linear-gradient(90deg, #0d0e30 8px, transparent 8px), linear-gradient(#0d0e30 4px, transparent 4px), linear-gradient(90deg, #0d0e30 4px, #000000 4px);
+    background-image: linear-gradient(#300d0d 8px, transparent 8px), linear-gradient(90deg, #300d0d 8px, transparent 8px), linear-gradient(#300d0d 4px, transparent 4px), linear-gradient(90deg, #300d0d 4px, #000000 4px);
     background-size: 200px 200px, 200px 200px, 40px 40px, 40px 40px;
     background-position: -8px -8px, -8px -8px, -4px -4px, -4px -4px;
     overflow: hidden;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    justify-items: center;
+    margin-top: -2em;
 }
 
 @keyframes moveBackground {
@@ -40,7 +42,7 @@ button {
 
 button.button {
     color: rgb(255, 255, 255);
-    background-color: rgb(13, 12, 77);
+    background-color: #460c0c;
     font-weight: 1000;
     letter-spacing: 1px;
     padding: 2em 4em 2em 4em;
@@ -59,7 +61,7 @@ button:hover {
 }
 
 button.website {
-    background-color: rgb(13, 12, 77);
+    background-color: #300d0d;
     color: rgb(255, 255, 255);
     margin: 5px;
     font-weight: 600;
@@ -71,7 +73,16 @@ button.website {
     left: 0;
 }
 
+h1 {
+    font-size: 60px;
+}
+h1,h3{
+    font-family: 'Press Start 2P';
 
+}
+h3{
+    margin-bottom: 0.4em;
+}
 
 a {
     color: white;

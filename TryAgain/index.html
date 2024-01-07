@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main screen</title>
+    <link rel="icon" href="img/logoBall.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+</head>
+
+<body class="background">
+    <header>
+        <form action="https://ondrejhonus.xyz" target="_blank">
+            <button class="website">My website</button>
+        </form>
+    </header>
+    <main>
+        <h1>GAME OVER!</h1>
+        <h3>Try again?</h3>
+        <form>
+            <button class="button" formaction="../Play/">Sure!</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2024 - Ondřej Honus</p>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Check if the cookie exists
+        var cookieAccepted = getCookie("cookieAccepted");
+
+        // If the cookie doesn't exist, show the modal
+        if (!cookieAccepted) {
+            $('#cookieModal').modal('show');
+        }
+
+        // Set the cookie when the user clicks "Got it!"
+        $('#cookieModal').on('hidden.bs.modal', function () {
+            setCookie("cookieAccepted", "true", 365); // Set the cookie to expire in 365 days
+        });
+    });
+
+    // Function to set a cookie
+    function setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    // Function to get the value of a cookie
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+  </script>
+</body>
+
+</html>

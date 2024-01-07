@@ -1,5 +1,6 @@
 let player;
 let blinkingBalls = [];
+let hit = false;
 
 //**************************************************************//
 //************************PLAYER**************************//
@@ -12,6 +13,7 @@ class Player {
         this.w = 40;
         this.h = 40;
         this.v = 10;
+        this.color = 'f'
     }
 
 // MOVEMENT SYSTEM
@@ -32,7 +34,7 @@ class Player {
     }
     draw() {
         this.move();
-        fill('f');
+        fill(this.color);
         rectMode(CENTER);
         push();
         translate(this.x, this.y);
@@ -93,7 +95,6 @@ class BlinkingBall {
                     let y = Math.sin(angle) * distance;
                 if (random(-1, 1) > 0) x *= -1;
                 if (random(-1, 1) > 0) y *= -1;
-                console.log(x)
                 this.explosions.push(new BlinkingBall(this.x, this.y, x, y , 10, 10, false));
             }
         }
@@ -115,7 +116,6 @@ class BlinkingBall {
                 const element = this.explosions[index];
                 if (!element.drawn()) this.explosions.splice(index, 1);
             } 
-            console.log(this.explosions)
             return;
         }
     }
@@ -132,15 +132,30 @@ class BlinkingBall {
 
       }
       function draw() {
-        background('#000216');
+        background('#222222');
         player.draw();
 
         if (frameCount % 60 == 0) {
             blinkingBalls.push(new BlinkingBall());
             console.log("new ball")
     }
-        blinkingBalls.forEach((blinkingBall) => {
+       /* blinkingBalls.forEach((blinkingBall) => {
             blinkingBall.draw();
+        });
+        */
+        
+
+        blinkingBalls.forEach(function (ball, idx, arr) {
+            ball.draw();
+            if(!ball.explosions) return;
+            for (const explosion of ball.explosions) {
+                hit = collideCircleCircle(player.x, player.y, player.w, explosion.x, explosion.y, explosion.w);
+                if(hit){
+                    window.location.replace("../TryAgain/");
+                }
+            }
+        
+
         });
 }
 
