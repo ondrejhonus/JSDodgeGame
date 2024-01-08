@@ -4,8 +4,10 @@ let hit = false;
 let seconds = 0;
 let topSecondsLived = localStorage.getItem('topSecondsLived') || 0;
 let smallBalls = 12;
-
-
+let playerImage;
+let popSound1;
+let popSound2;
+let popSound3;
 
 // Making cheating impossible ig idk who knows
 
@@ -28,7 +30,6 @@ class Player {
         this.w = 40;
         this.h = 40;
         this.v = 10;
-        this.color = 'f'
     }
 
     // MOVEMENT SYSTEM
@@ -49,11 +50,10 @@ class Player {
     }
     draw() {
         this.move();
-        fill(this.color);
         rectMode(CENTER);
         push();
         translate(this.x, this.y);
-        rect(0, 0, this.w, this.h, 360, 360);
+        image(playerImage, -25, -25, 45, 45);
         pop();
     }
 }
@@ -105,7 +105,28 @@ class BlinkingBall {
             let newColor = lerpColor(color('red'), color(255), (elapsedTime - this.appearDuration) / this.explosionDuration);
 
             if (this.explosions.length < 10) {
-
+                if (this.explosions.length < 10) {
+                    let nowSoundNumber = Math.floor(random(1, 4));
+                    if (nowSoundNumber == 4) {
+                        nowSoundNumber = 3;
+                    }
+                
+                    let nowSound;
+                    if (nowSoundNumber === 1) {
+                        nowSound = popSound1;
+                    } else if (nowSoundNumber === 2) {
+                        nowSound = popSound2;
+                    } else {
+                        nowSound = popSound3;
+                    }
+                
+                    console.log('Playing sound:', nowSoundNumber);
+                    
+                    // Check if the sound object exists before playing
+                    if (nowSound) {
+                        nowSound.play();
+                    }
+                }
                 for (let index = 0; index < smallBalls; index++) {
                     let angle = Math.random() * Math.PI * 2;
                     let distance = Math.random() * 2 + 2;
@@ -142,6 +163,15 @@ class BlinkingBall {
 //**************************************************************//
 //************************SETUP / DRAW**************************//
 //**************************************************************//
+
+function preload() {
+    playerImage = loadImage("../img/doge.png");
+    soundFormats('mp3', 'ogg');
+    popSound1 = loadSound('../media/pop1');
+    popSound2 = loadSound('../media/pop2');
+    popSound3 = loadSound('../media/pop3');
+
+  }
 
 function setup() {
     canvas = createCanvas(window.innerWidth - 75, window.innerHeight - 75);

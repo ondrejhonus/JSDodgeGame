@@ -71,7 +71,9 @@ button.website {
     left: 0;
 }
 
-
+h1{
+    font-size: 60px;
+}
 
 a {
     color: white;
