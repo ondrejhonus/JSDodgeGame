@@ -3,7 +3,7 @@ let blinkingBalls = [];
 let hit = false;
 let seconds = 0;
 let topSecondsLived = localStorage.getItem('topSecondsLived') || 0;
-
+let smallBalls = 12;
 
 
 
@@ -88,10 +88,7 @@ class BlinkingBall {
 
     draw() {
         let elapsedTime = millis() - this.creationTime;
-        let smallBalls = 10;
-        if (frameCount % 60 == 0) {
-            smallBalls + 10;
-        }    
+  
 
         if (this.drawn()) {
             // Red ball appearance
@@ -127,12 +124,12 @@ class BlinkingBall {
             rect(0, 0, newSize, newSize, 360, 360);
             pop();
         } else {
-            // Remove ball from keš
             if (!this.explosions) return;
             for (const explosion of this.explosions) {
                 if (explosion.parent) continue;
                 explosion.draw();
             }
+            // Remove ball from keš
             for (let index = 0; index < this.explosions.length; index++) {
                 const element = this.explosions[index];
                 if (!element.drawn()) this.explosions.splice(index, 1);
@@ -150,6 +147,8 @@ function setup() {
     canvas = createCanvas(window.innerWidth - 75, window.innerHeight - 75);
     player = new Player(width / 2, height / 2);
     //    blinkingBalls = new BlinkingBall(Math.floor(Math.random() * (width-75)), Math.floor(Math.random() * (height-75)));
+
+    // 60fps if ur potato pc can handle it
     frameRate(60);
 
 }
@@ -158,10 +157,18 @@ function draw() {
     player.draw();
     document.getElementById("topSecondsLived").innerText = 'Best run: ' + topSecondsLived + 's';
 
+    // If my math is good then this adds 2 balls every 10 seconds? i hope lol..
+    if(frameCount % 600 == 0){
+        smallBalls += 2;
+    }
+
+    // Every 2s new ball
     if (frameCount % 60 == 0) {
         blinkingBalls.push(new BlinkingBall());
         console.log("new ball");
     }
+
+    // Every second in Africa a second passes O_O
     if (frameCount % 60 == 0) {
         seconds++;
         document.getElementById("currentSeconds").innerText = seconds + 's';
@@ -170,7 +177,7 @@ function draw() {
             topSecondsLived = seconds;
             localStorage.setItem('topSecondsLived', topSecondsLived);
         }
-    }
+    } 
     /* blinkingBalls.forEach((blinkingBall) => {
          blinkingBall.draw();
      });
@@ -192,11 +199,3 @@ function draw() {
     });
 
 }
-
-//**************************************************************//
-//************************LEVEL SYSTEM**************************//
-//**************************************************************//
-
-
-
-
