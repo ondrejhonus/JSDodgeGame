@@ -183,7 +183,8 @@ function draw() {
         for (const explosion of ball.explosions) {
             hit = collideCircleCircle(player.x, player.y, player.w, explosion.x, explosion.y, explosion.w);
             if (hit) {
-                //window.location.replace("../TryAgain/");
+                // Game over hah
+                window.location.replace("../TryAgain/");
             }
         }
 
