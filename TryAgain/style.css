@@ -1,5 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
-
+html,body{
+    width: 100%;
+    display: flex;
+    margin: 0;
+    align-content: center;
+    vertical-align: middle;
+}
 body {
     font-family: 'Poppins', sans-serif !important;
     background-color: black;
@@ -98,4 +104,11 @@ div {
     height: 100%;
     position: absolute;
     animation: moveBackground 500s linear infinite;
+}
+.topscore{
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    text-align: center;
 }

@@ -11,6 +11,7 @@ let popSound2;
 let popSound3;
 
 // Making cheating impossible ig idk who knows
+// Meaning that when the user leaves the page, the counter pauses
 
 document.addEventListener('visibilitychange', handleVisibilityChange);
 function handleVisibilityChange() {
@@ -206,7 +207,7 @@ class GuidedMissile {
 
 
 //**************************************************************//
-//************************SETUP / DRAW**************************//
+//************************ LASER GUN **************************//
 //**************************************************************//
 
 class Laser{
