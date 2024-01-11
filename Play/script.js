@@ -1,5 +1,6 @@
 let player;
 let blinkingBalls = [];
+let guidedMissiles = [];
 let hit = false;
 let seconds = 0;
 let topSecondsLived = localStorage.getItem('topSecondsLived') || 0;
@@ -63,7 +64,7 @@ class Player {
 //**************************************************************//
 
 class BlinkingBall {
-    constructor(x = random(0, width), y = random(0, height), dirX = 0, dirY = 0, w = 40, h = 40, parent = true, appear = 1500) {
+    constructor(x = random(0, width), y = random(0, height), dirX = 0, dirY = 0, w = 40, h = 40, parent = true, appear = 1500, remove = false) {
         this.x = x;
         this.y = y;
         this.w = w;
@@ -75,6 +76,8 @@ class BlinkingBall {
         this.explosionDuration = 200;
         this.explosions = [];
         this.parent = parent;
+        this.remove = remove; // New property to indicate whether the ball should be removed
+
 
         if (this.parent) {
             blinkingBalls.push(this);
@@ -88,7 +91,7 @@ class BlinkingBall {
 
     draw() {
         let elapsedTime = millis() - this.creationTime;
-  
+
 
         if (this.drawn()) {
             // Red ball appearance
@@ -110,7 +113,7 @@ class BlinkingBall {
                     if (nowSoundNumber == 4) {
                         nowSoundNumber = 3;
                     }
-                
+
                     let nowSound;
                     if (nowSoundNumber === 1) {
                         nowSound = popSound1;
@@ -119,9 +122,9 @@ class BlinkingBall {
                     } else {
                         nowSound = popSound3;
                     }
-                
+
                     console.log('Playing sound:', nowSoundNumber);
-                    
+
                     // Check if the sound object exists before playing
                     if (nowSound) {
                         nowSound.play();
@@ -134,7 +137,7 @@ class BlinkingBall {
                     let y = Math.sin(angle) * distance;
                     if (random(-1, 1) > 0) x *= -1;
                     if (random(-1, 1) > 0) y *= -1;
-                    this.explosions.push(new BlinkingBall(this.x, this.y, x, y, 10, 10, false, 5000));
+                    this.explosions.push(new BlinkingBall(this.x, this.y, x, y, 10, 10, false, 5000, true));
                 }
             }
 
@@ -145,6 +148,7 @@ class BlinkingBall {
             rect(0, 0, newSize, newSize, 360, 360);
             pop();
         } else {
+            
             if (!this.explosions) return;
             for (const explosion of this.explosions) {
                 if (explosion.parent) continue;
@@ -153,10 +157,61 @@ class BlinkingBall {
             // Remove ball from keš
             for (let index = 0; index < this.explosions.length; index++) {
                 const element = this.explosions[index];
-                if (!element.drawn()) this.explosions.splice(index, 1);
+                if(this.x > width || this.y > height || this.x < 0 || this.y < 0 ){
+                    this.explosions.splice(index, 1);
+                }
+                else if (!element.drawn()) this.explosions.splice(index, 1);
             }
             return;
         }
+    }
+}
+
+//**************************************************************//
+//************************ GUIDED MISSILE **************************//
+//**************************************************************//
+
+class GuidedMissile {
+    constructor() {
+        this.w = 20;
+        this.x = random(0, width);
+        this.y = random(0, height);
+        this.color = 'yellow';
+        this.speed = 3;
+        this.lifespan = 5000; // 5 seconds lifespan
+        this.creationTime = millis();
+    }
+
+    update() {
+        // Move towards the player (assuming the player position is static)
+        let angle = atan2(player.y - this.y, player.x - this.x);
+        this.x += this.speed * cos(angle);
+        this.y += this.speed * sin(angle);
+    }
+
+    remove() {
+        return millis() - this.creationTime > this.lifespan;
+    }
+
+    draw() {
+        // Draw the guided missile
+        fill(this.color);
+        rectMode(CENTER);
+        push();
+        translate(this.x, this.y);
+        rect(0, 0, this.w, this.w, 360, 360);
+        pop();
+    }
+}
+
+
+//**************************************************************//
+//************************SETUP / DRAW**************************//
+//**************************************************************//
+
+class Laser{
+    constructor(){
+        // Pak >:(
     }
 }
 
@@ -171,7 +226,7 @@ function preload() {
     popSound2 = loadSound('../media/pop2');
     popSound3 = loadSound('../media/pop3');
 
-  }
+}
 
 function setup() {
     canvas = createCanvas(window.innerWidth - 75, window.innerHeight - 75);
@@ -186,9 +241,27 @@ function draw() {
     background('rgba(34, 34, 34, 1)');
     player.draw();
     document.getElementById("topSecondsLived").innerText = 'Best run: ' + topSecondsLived + 's';
+    for (let i = guidedMissiles.length - 1; i >= 0; i--) {
+        guidedMissiles[i].update();
+        guidedMissiles[i].draw();
+        if (guidedMissiles[i].remove()) {
+            guidedMissiles.splice(i, 1);
+        }
+    }
 
+    if (frameCount % 120 == 0) {
+        guidedMissiles.push(new GuidedMissile());
+    }
+
+    for (const guidedMissile of guidedMissiles) {
+        hit = collideCircleCircle(player.x, player.y, player.w-2, guidedMissile.x, guidedMissile.y, guidedMissile.w-2);
+        if (hit) {
+            // Game over hah
+            window.location.replace("../TryAgain/");
+        }
+    }
     // If my math is good then this adds 2 balls every 10 seconds? i hope lol..
-    if(frameCount % 600 == 0){
+    if (frameCount % 600 == 0) {
         smallBalls += 2;
     }
 
@@ -207,25 +280,22 @@ function draw() {
             topSecondsLived = seconds;
             localStorage.setItem('topSecondsLived', topSecondsLived);
         }
-    } 
-    /* blinkingBalls.forEach((blinkingBall) => {
-         blinkingBall.draw();
-     });
-     */
-
+    }
 
     blinkingBalls.forEach(function (ball, idx, arr) {
         ball.draw();
-        if (!ball.explosions) return;
+        if (ball.remove) {
+            arr.splice(idx, 1);
+        } else if (!ball.explosions) {
+            return;
+        }
+
         for (const explosion of ball.explosions) {
-            hit = collideCircleCircle(player.x, player.y, player.w, explosion.x, explosion.y, explosion.w);
+            hit = collideCircleCircle(player.x, player.y, player.w-2, explosion.x, explosion.y, explosion.w-2);
             if (hit) {
                 // Game over hah
                 window.location.replace("../TryAgain/");
             }
         }
-
-
     });
-
 }
