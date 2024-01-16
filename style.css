@@ -108,10 +108,11 @@ div.warning{
     top:  0;
     left: 0;
     background-color: #ffd600;
-    opacity: 1;
+    opacity: 0.6;
     background: repeating-linear-gradient( 45deg, #ff6800, #ff6800 8px, #ffd600 8px, #ffd600 40px );
     animation: moveBackgroundDown 200s linear infinite;
 }
 div.warning p{
-    opacity: 1;
+    opacity: 1 !important;
+    color: rgb(0, 0, 0) !important;
 }

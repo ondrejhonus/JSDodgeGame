@@ -1,6 +1,7 @@
 let player;
 let blinkingBalls = [];
 let guidedMissiles = [];
+let lasers = [];
 let hit = false;
 let seconds = 0;
 let topSecondsLived = localStorage.getItem('topSecondsLived') || 0;
@@ -77,7 +78,7 @@ class BlinkingBall {
         this.explosionDuration = 200;
         this.explosions = [];
         this.parent = parent;
-        this.remove = remove; // New property to indicate whether the ball should be removed
+        this.remove = remove;
 
 
         if (this.parent) {
@@ -126,14 +127,13 @@ class BlinkingBall {
 
                     console.log('Playing sound:', nowSoundNumber);
 
-                    // Check if the sound object exists before playing
                     if (nowSound) {
                         nowSound.play();
                     }
                 }
                 for (let index = 0; index < smallBalls; index++) {
                     let angle = Math.random() * Math.PI * 2;
-                    let distance = Math.random() * 2 + 2;
+                    let distance = Math.random() * 2 + 5;
                     let x = Math.cos(angle) * distance;
                     let y = Math.sin(angle) * distance;
                     if (random(-1, 1) > 0) x *= -1;
@@ -177,14 +177,13 @@ class GuidedMissile {
         this.w = 20;
         this.x = random(0, width);
         this.y = random(0, height);
-        this.color = 'yellow';
+        this.color = 'orange';
         this.speed = 3;
-        this.lifespan = 5000; // 5 seconds lifespan
+        this.lifespan = 5000; 
         this.creationTime = millis();
     }
 
     update() {
-        // Move towards the player (assuming the player position is static)
         let angle = atan2(player.y - this.y, player.x - this.x);
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
@@ -195,7 +194,6 @@ class GuidedMissile {
     }
 
     draw() {
-        // Draw the guided missile
         fill(this.color);
         rectMode(CENTER);
         push();
@@ -207,12 +205,111 @@ class GuidedMissile {
 
 
 //**************************************************************//
-//************************ LASER GUN **************************//
+//************************ Deadly part of the laser **************************//
 //**************************************************************//
 
-class Laser{
-    constructor(){
-        // Pak >:(
+class LaserProjectile {
+    constructor(x, y, angle) {
+        this.x = x;
+        this.y = y;
+        this.angle = angle;
+        this.speed = 40;
+        this.w = 15;
+        this.h = 15;
+        this.creationTime = millis();
+        this.lifespan = 5000;
+        this.color = 'lime';
+    }
+
+    update() {
+        this.x += this.speed * cos(this.angle);
+        this.y += this.speed * sin(this.angle);
+    }
+
+    remove() {
+        return millis() - this.creationTime > this.lifespan;
+    }
+
+    draw() {
+        fill(this.color);
+        ellipse(this.x, this.y, this.w, this.h);
+    }
+}
+
+//**************************************************************//
+//************************ EYE part of the laser **************************//
+//**************************************************************//
+
+class Laser {
+    constructor(corner) {
+        this.size = 100;
+        this.color = 'rgb(255, 160, 153)';
+        this.lifespan = 3000;
+        this.corner = corner;
+        this.calculatePosition();
+        this.projectiles = [];
+        this.creationTime = millis(); 
+    }
+
+    calculatePosition() {
+        let eyeOffset = this.size / 4;
+        if (this.corner == 1) {
+            this.x = 0 + eyeOffset;
+            this.y = 0 + eyeOffset;
+        } else if (this.corner == 2) {
+            this.x = width - eyeOffset;
+            this.y = 0 + eyeOffset;
+        } else if (this.corner == 3) {
+            this.x = width - eyeOffset;
+            this.y = height - eyeOffset;
+        } else {
+            this.x = 0 + eyeOffset;
+            this.y = height - eyeOffset;
+        }
+    }
+
+    remove() {
+        return millis() - this.creationTime > this.lifespan;
+    }
+
+    draw() {
+        push();
+        translate(this.x, this.y);
+
+        let angle = atan2(player.y - this.y, player.x - this.x);
+
+        fill('white');
+        ellipse(0, 0, this.size);
+
+        let eyeSize = this.size / 2;
+        let eyeX = cos(angle) * (this.size / 4);
+        let eyeY = sin(angle) * (this.size / 4);
+
+        fill('blue');
+        let blueSize = eyeSize / 2;
+        ellipse(eyeX, eyeY, blueSize * 2);
+
+        fill('black');
+        let blackSize = blueSize / 2;
+        ellipse(eyeX, eyeY, blackSize * 2);
+
+        noFill();
+        stroke('rgba(255, 0, 0, 0.5)'); 
+        strokeWeight(2);
+        line(eyeX, eyeY, eyeX + cos(angle) * 2000, eyeY + sin(angle) * 2000);
+        if (frameCount % 500 == 0) {
+            this.projectiles.push(new LaserProjectile(eyeX, eyeY, angle));
+        }
+
+        for (let i = this.projectiles.length - 1; i >= 0; i--) {
+            this.projectiles[i].update();
+            this.projectiles[i].draw();
+            if (this.projectiles[i].remove()) {
+                this.projectiles.splice(i, 1);
+            }
+        }
+
+        pop();
     }
 }
 
@@ -241,7 +338,9 @@ function setup() {
 function draw() {
     background('rgba(34, 34, 34, 1)');
     player.draw();
+
     document.getElementById("topSecondsLived").innerText = 'Best run: ' + topSecondsLived + 's';
+
     for (let i = guidedMissiles.length - 1; i >= 0; i--) {
         guidedMissiles[i].update();
         guidedMissiles[i].draw();
@@ -250,6 +349,9 @@ function draw() {
         }
     }
 
+
+
+    // Every 2s new missile
     if (frameCount % 120 == 0) {
         guidedMissiles.push(new GuidedMissile());
     }
@@ -261,12 +363,29 @@ function draw() {
             window.location.replace("../TryAgain/");
         }
     }
+
+    for (let i = lasers.length - 1; i >= 0; i--) {
+        lasers[i].draw();
+        if (lasers[i].remove()) {
+            lasers.splice(i, 1);
+        }
+    }
+
+    if (frameCount % 420 == 0) {
+        let corner = Math.floor(random(1, 5));
+        console.log('Laser spawner at corner no.' + corner);
+        lasers.push(new Laser(corner));
+    }
+
+
+
+
     // If my math is good then this adds 2 balls every 10 seconds? i hope lol..
     if (frameCount % 600 == 0) {
         smallBalls += 2;
     }
 
-    // Every 2s new ball
+    // Every 1s new ball
     if (frameCount % 60 == 0) {
         blinkingBalls.push(new BlinkingBall());
         console.log("new ball");
