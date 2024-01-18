@@ -2,10 +2,11 @@ let player;
 let blinkingBalls = [];
 let guidedMissiles = [];
 let lasers = [];
+let projectiles = [];
 let hit = false;
 let seconds = 0;
 let topSecondsLived = localStorage.getItem('topSecondsLived') || 0;
-let smallBalls = 12;
+let smallBalls = 1;
 let playerImage;
 let popSound1;
 let popSound2;
@@ -13,7 +14,6 @@ let popSound3;
 
 // Making cheating impossible ig idk who knows
 // Meaning that when the user leaves the page, the counter pauses
-
 document.addEventListener('visibilitychange', handleVisibilityChange);
 function handleVisibilityChange() {
     if (document.hidden) {
@@ -80,7 +80,6 @@ class BlinkingBall {
         this.parent = parent;
         this.remove = remove;
 
-
         if (this.parent) {
             blinkingBalls.push(this);
         }
@@ -96,7 +95,7 @@ class BlinkingBall {
 
 
         if (this.drawn()) {
-            // Red ball appearance
+            // make red ball
             fill('red');
             rectMode(CENTER);
             push();
@@ -116,6 +115,7 @@ class BlinkingBall {
                         nowSoundNumber = 3;
                     }
 
+                    // Make a random pop sound from 1-3, there is a small chance that it will be 4, but that is just a 3
                     let nowSound;
                     if (nowSoundNumber === 1) {
                         nowSound = popSound1;
@@ -125,7 +125,6 @@ class BlinkingBall {
                         nowSound = popSound3;
                     }
 
-                    console.log('Playing sound:', nowSoundNumber);
 
                     if (nowSound) {
                         nowSound.play();
@@ -141,7 +140,7 @@ class BlinkingBall {
                     this.explosions.push(new BlinkingBall(this.x, this.y, x, y, 10, 10, false, 5000, true));
                 }
             }
-
+            // make explosion
             fill(newColor);
             rectMode(CENTER);
             push();
@@ -149,7 +148,7 @@ class BlinkingBall {
             rect(0, 0, newSize, newSize, 360, 360);
             pop();
         } else {
-            
+
             if (!this.explosions) return;
             for (const explosion of this.explosions) {
                 if (explosion.parent) continue;
@@ -158,7 +157,7 @@ class BlinkingBall {
             // Remove ball from keš
             for (let index = 0; index < this.explosions.length; index++) {
                 const element = this.explosions[index];
-                if(this.x > width || this.y > height || this.x < 0 || this.y < 0 ){
+                if (this.x > width || this.y > height || this.x < 0 || this.y < 0) {
                     this.explosions.splice(index, 1);
                 }
                 else if (!element.drawn()) this.explosions.splice(index, 1);
@@ -179,16 +178,16 @@ class GuidedMissile {
         this.y = random(0, height);
         this.color = 'orange';
         this.speed = 3;
-        this.lifespan = 5000; 
+        this.lifespan = 5000;
         this.creationTime = millis();
     }
-
+    // the missile follows the player
     update() {
         let angle = atan2(player.y - this.y, player.x - this.x);
         this.x += this.speed * cos(angle);
         this.y += this.speed * sin(angle);
     }
-
+    // the missile disappears after 5 seconds
     remove() {
         return millis() - this.creationTime > this.lifespan;
     }
@@ -220,19 +219,19 @@ class LaserProjectile {
         this.lifespan = 5000;
         this.color = 'lime';
     }
-
+    // the laser projectile follows the player
     update() {
         this.x += this.speed * cos(this.angle);
         this.y += this.speed * sin(this.angle);
     }
-
+    // the laser projectile disappears after 5 seconds
     remove() {
         return millis() - this.creationTime > this.lifespan;
     }
-
+    // the laser projectile is made into a circle
     draw() {
         fill(this.color);
-        ellipse(this.x, this.y, this.w, this.h);
+        circle(this.x, this.y, this.w);
     }
 }
 
@@ -244,27 +243,29 @@ class Laser {
     constructor(corner) {
         this.size = 100;
         this.color = 'rgb(255, 160, 153)';
-        this.lifespan = 3000;
+        this.lifespan = 5000;
         this.corner = corner;
         this.calculatePosition();
-        this.projectiles = [];
-        this.creationTime = millis(); 
+        this.creationTime = millis();
+        this.isFiring = false; // Added property to track if projectile is firing
     }
 
     calculatePosition() {
-        let eyeOffset = this.size / 4;
-        if (this.corner == 1) {
-            this.x = 0 + eyeOffset;
-            this.y = 0 + eyeOffset;
-        } else if (this.corner == 2) {
-            this.x = width - eyeOffset;
-            this.y = 0 + eyeOffset;
-        } else if (this.corner == 3) {
-            this.x = width - eyeOffset;
-            this.y = height - eyeOffset;
-        } else {
-            this.x = 0 + eyeOffset;
-            this.y = height - eyeOffset;
+        if (!this.isFiring) { // Only calculate position if not firing
+            let eyeOffset = this.size / 4;
+            if (this.corner == 1) {
+                this.x = 0 + eyeOffset;
+                this.y = 0 + eyeOffset;
+            } else if (this.corner == 2) {
+                this.x = width - eyeOffset;
+                this.y = 0 + eyeOffset;
+            } else if (this.corner == 3) {
+                this.x = width - eyeOffset;
+                this.y = height - eyeOffset;
+            } else {
+                this.x = 0 + eyeOffset;
+                this.y = height - eyeOffset;
+            }
         }
     }
 
@@ -294,22 +295,36 @@ class Laser {
         ellipse(eyeX, eyeY, blackSize * 2);
 
         noFill();
-        stroke('rgba(255, 0, 0, 0.5)'); 
+        stroke('rgba(255, 0, 0, 0.5)');
+        if (this.isFiring) { // Only draw line if firing
+            stroke('rgba(0, 0, 0, 0)');
+        }
         strokeWeight(2);
         line(eyeX, eyeY, eyeX + cos(angle) * 2000, eyeY + sin(angle) * 2000);
         if (frameCount % 500 == 0) {
-            this.projectiles.push(new LaserProjectile(eyeX, eyeY, angle));
+            projectiles.push(new LaserProjectile(eyeX, eyeY, angle));
+            this.isFiring = true; // Set isFiring to true when projectile fires
         }
 
-        for (let i = this.projectiles.length - 1; i >= 0; i--) {
-            this.projectiles[i].update();
-            this.projectiles[i].draw();
-            if (this.projectiles[i].remove()) {
-                this.projectiles.splice(i, 1);
+        for (let i = projectiles.length - 1; i >= 0; i--) {
+            projectiles[i].update();
+            projectiles[i].draw();
+            if (projectiles[i].remove()) {
+                projectiles.splice(i, 1);
+                this.isFiring = false; // Set isFiring to false when projectile is removed
+                stroke('rgba(0, 0, 0, 0.5)');
+            }
+        }
+        for (const LaserProjectile of projectiles) {
+            hit = collideCircleCircle(LaserProjectile.x, LaserProjectile.y, LaserProjectile.size, player.x, player.y, player.w);
+            if (hit) {
+                // Game over
+                window.location.replace("../TryAgain/");
             }
         }
 
         pop();
+
     }
 }
 
@@ -349,7 +364,7 @@ function draw() {
         }
     }
 
-
+    
 
     // Every 2s new missile
     if (frameCount % 120 == 0) {
@@ -357,7 +372,7 @@ function draw() {
     }
 
     for (const guidedMissile of guidedMissiles) {
-        hit = collideCircleCircle(player.x, player.y, player.w-2, guidedMissile.x, guidedMissile.y, guidedMissile.w-2);
+        hit = collideCircleCircle(player.x, player.y, player.w, guidedMissile.x, guidedMissile.y, guidedMissile.w);
         if (hit) {
             // Game over hah
             window.location.replace("../TryAgain/");
@@ -370,13 +385,20 @@ function draw() {
             lasers.splice(i, 1);
         }
     }
+    for (const LaserProjectile of projectiles) {
+        hit = collideCircleCircle(LaserProjectile.x, LaserProjectile.y, LaserProjectile.size, player.x, player.y, player.w);
+        if (hit) {
+            // Game over
+            window.location.replace("../TryAgain/");
+        }
+    }
+    
 
+  // Spawn a laser every 7 seconds
     if (frameCount % 420 == 0) {
         let corner = Math.floor(random(1, 5));
-        console.log('Laser spawner at corner no.' + corner);
         lasers.push(new Laser(corner));
     }
-
 
 
 
@@ -388,14 +410,13 @@ function draw() {
     // Every 1s new ball
     if (frameCount % 60 == 0) {
         blinkingBalls.push(new BlinkingBall());
-        console.log("new ball");
     }
 
-    // Every second in Africa a second passes O_O
+    // Every second in Africa a second passes O_O (and the counter goes up) 
     if (frameCount % 60 == 0) {
         seconds++;
         document.getElementById("currentSeconds").innerText = seconds + 's';
-
+     
         if (seconds > topSecondsLived) {
             topSecondsLived = seconds;
             localStorage.setItem('topSecondsLived', topSecondsLived);
@@ -409,13 +430,12 @@ function draw() {
         } else if (!ball.explosions) {
             return;
         }
-
         for (const explosion of ball.explosions) {
-            hit = collideCircleCircle(player.x, player.y, player.w-2, explosion.x, explosion.y, explosion.w-2);
+            hit = collideCircleCircle(player.x, player.y, player.w - 2, explosion.x, explosion.y, explosion.w - 2);
             if (hit) {
                 // Game over hah
                 window.location.replace("../TryAgain/");
             }
         }
     });
-}
+    }
