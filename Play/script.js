@@ -240,11 +240,11 @@ class LaserProjectile {
     this.x = x;
     this.y = y;
     this.angle = angle;
-    this.speed = 27;
+    this.speed = 20;
     this.w = 15;
     this.h = 15;
     this.creationTime = millis();
-    this.lifespan = 4000;
+    this.lifespan = 6000;
     this.color = "lime";
   }
   // the laser projectile follows the player
@@ -331,7 +331,7 @@ class Laser {
     line(eyeX, eyeY, eyeX + cos(angle) * 2000, eyeY + sin(angle) * 2000);
     // spawn 5 projectiles every after every 500 frames
     if (frameCount % 500 == 0) {
-      const delays = [0, 20, 50, 75, 100];
+      const delays = [0, 20, 50, 75, 100, 125, 140, 175, 200];
       for (const delay of delays) {
         setTimeout(() => {
           projectiles.push(new LaserProjectile(eyeX, eyeY, angle));
@@ -359,14 +359,14 @@ class Laser {
     // });
 
     for (const laserProjectile of projectiles) {
-    // calculate distance between player and laser projectile
+      // calculate distance between player and laser projectile
       const distance = dist(
         player.x,
         player.y,
         laserProjectile.x,
         laserProjectile.y
       );
- // if distance is less than 100, game over
+      // if distance is less than 100, game over
       if (distance < 100) {
         window.location.replace("../TryAgain/");
       }
@@ -376,13 +376,13 @@ class Laser {
         player.x,
         player.y,
         player.w + 15,
-        laserProjectile.x - 20,
-        laserProjectile.y - 20,
+        laserProjectile.x ,
+        laserProjectile.y ,
         laserProjectile.w + 40
       );
       if (hit) {
         // Game over hah
-          window.location.replace("../TryAgain/");
+        window.location.replace("../TryAgain/");
       }
     }
 
@@ -429,6 +429,35 @@ function draw() {
       localStorage.setItem("topSecondsLived", topSecondsLived);
     }
   }
+  /////////////////////////// MISSILES ///////////////////////////
+  // Every 2s new missile
+  if (frameCount % 120 == 0) {
+    guidedMissiles.push(new GuidedMissile());
+  }
+  // collision detection between player and missile
+  for (const guidedMissile of guidedMissiles) {
+    hit = collideCircleCircle(
+      player.x,
+      player.y,
+      player.w,
+      guidedMissile.x,
+      guidedMissile.y,
+      guidedMissile.w
+    );
+    if (hit) {
+      // Game over hah
+    //   window.location.replace("../TryAgain/");
+    }
+  }
+  // update missile position and draw it
+  for (let i = guidedMissiles.length - 1; i >= 0; i--) {
+    guidedMissiles[i].update();
+    guidedMissiles[i].draw();
+    // remove missiles older than lifespan
+    if (guidedMissiles[i].remove()) {
+      guidedMissiles.splice(i, 1);
+    }
+  }
 
   /////////////////////////// BALLS ///////////////////////////
 
@@ -452,7 +481,7 @@ function draw() {
       );
       if (hit) {
         // Game over hah
-        window.location.replace("../TryAgain/");
+        // window.location.replace("../TryAgain/");
       }
     }
   });
@@ -465,37 +494,6 @@ function draw() {
   // Every 1s new ball
   if (frameCount % 60 == 0) {
     blinkingBalls.push(new BlinkingBall());
-  }
-
-  /////////////////////////// MISSILES ///////////////////////////
-
-  // Every 2s new missile
-  if (frameCount % 120 == 0) {
-    guidedMissiles.push(new GuidedMissile());
-  }
-  // update missile position and draw it
-  for (let i = guidedMissiles.length - 1; i >= 0; i--) {
-    guidedMissiles[i].update();
-    guidedMissiles[i].draw();
-    // remove missiles older than lifespan
-    if (guidedMissiles[i].remove()) {
-      guidedMissiles.splice(i, 1);
-    }
-  }
-  // collision detection between player and missile
-  for (const guidedMissile of guidedMissiles) {
-    hit = collideCircleCircle(
-      player.x,
-      player.y,
-      player.w,
-      guidedMissile.x,
-      guidedMissile.y,
-      guidedMissile.w
-    );
-    if (hit) {
-      // Game over hah
-      window.location.replace("../TryAgain/");
-    }
   }
 
   /////////////////////////// LASERS ///////////////////////////
