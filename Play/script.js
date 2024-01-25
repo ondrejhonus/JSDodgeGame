@@ -38,15 +38,21 @@ class Player {
   // MOVEMENT SYSTEM
 
   move() {
+    // If a specific key is pressed, the player moves a set direction on the canvas
+
+    // W Forward
     if (keyIsDown(87) || keyIsDown(UP_ARROW)) {
       if (this.y > this.h / 2) this.y -= this.v;
     }
+    // S Backward
     if (keyIsDown(83) || keyIsDown(DOWN_ARROW)) {
       if (this.y < height - this.h / 2) this.y += this.v;
     }
+    // A Left
     if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
       if (this.x > this.w / 2) this.x -= this.v;
     }
+    // D Right
     if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
       if (this.x < width - this.w / 2) this.x += this.v;
     }
@@ -67,6 +73,7 @@ class Player {
 
 class BlinkingBall {
   constructor(
+    // The ball spawns at a random position of the canvas
     x = random(0, width),
     y = random(0, height),
     dirX = 0,
@@ -77,6 +84,7 @@ class BlinkingBall {
     appear = 1500,
     remove = false
   ) {
+    // this.x = x coz i want all of them random 
     this.x = x;
     this.y = y;
     this.w = w;
@@ -102,6 +110,7 @@ class BlinkingBall {
   }
 
   draw() {
+    // Save how long it has lived
     let elapsedTime = millis() - this.creationTime;
 
     if (this.drawn()) {
@@ -115,7 +124,7 @@ class BlinkingBall {
       this.y += this.dirY;
       pop();
     } else if (
-      // if ball is drawn and it has is a parent
+      // if ball is still drawn on the canvas and it has is a parent
       this.parent &&
       elapsedTime < this.appearDuration + this.explosionDuration
     ) {
@@ -237,6 +246,7 @@ class GuidedMissile {
 
 class LaserProjectile {
   constructor(x, y, angle) {
+    // X and Y is gonna be defined by the corner func. 
     this.x = x;
     this.y = y;
     this.angle = angle;
@@ -279,7 +289,7 @@ class Laser {
   }
 
   calculatePosition() {
-    // Only calculate position if not firing
+    // set the pupil to correct side of the eye
     let eyeOffset = this.size / 4;
     if (this.corner == 1) {
       this.x = 0 + eyeOffset;
@@ -314,6 +324,7 @@ class Laser {
     let eyeX = cos(angle) * (this.size / 4);
     let eyeY = sin(angle) * (this.size / 4);
 
+    // Make the eye more "layers"
     fill("blue");
     let blueSize = eyeSize / 2;
     circle(eyeX, eyeY, blueSize * 2);
@@ -329,7 +340,7 @@ class Laser {
       stroke("rgba(0, 0, 0, 0)");
     }
     line(eyeX, eyeY, eyeX + cos(angle) * 2000, eyeY + sin(angle) * 2000);
-    // spawn 5 projectiles every after every 500 frames
+    // spawn X projectiles every after every 500 frames at an expanding delay
     if (frameCount % 500 == 0) {
       const delays = [0, 20, 50, 75, 100, 125, 140, 175, 200];
       for (const delay of delays) {
@@ -417,7 +428,7 @@ function draw() {
   /////////////////////////// COUNTER ///////////////////////////
   document.getElementById("topSecondsLived").innerText =
     "Best run: " + topSecondsLived + "s";
-  // Every second in Africa a second passes O_O (and the counter goes up)
+    // Update counter
   if (frameCount % 60 == 0) {
     seconds++;
     // Update the counter
@@ -446,7 +457,7 @@ function draw() {
     );
     if (hit) {
       // Game over hah
-    //   window.location.replace("../TryAgain/");
+      window.location.replace("../TryAgain/");
     }
   }
   // update missile position and draw it
@@ -481,7 +492,7 @@ function draw() {
       );
       if (hit) {
         // Game over hah
-        // window.location.replace("../TryAgain/");
+        window.location.replace("../TryAgain/");
       }
     }
   });
